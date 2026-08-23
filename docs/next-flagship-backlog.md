@@ -4,9 +4,9 @@ These are the next public portfolio lanes. They should become real artifacts onl
 
 ## 1. AI Agent / MCP Public Slice
 
-Purpose: show AI-enabled delivery and reference-intelligence thinking without exposing private AI-Agent-Ops material.
+Purpose: show AI-enabled delivery and reference-intelligence thinking without exposing private operational material.
 
-Boundary: keep `AI-Agent-Ops` private. REF-001 issue #20 remains the canonical source for shared AI Work OS / Reference Intelligence decisions.
+Boundary: keep the private canonical AI workstream private. Public material should be created only from sanitized, deliberately approved patterns.
 
 Candidate artifact:
 
