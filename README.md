@@ -2,94 +2,112 @@
 
 [![CI](https://github.com/mypoorbrain/enterprise-workflow-approval-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/mypoorbrain/enterprise-workflow-approval-lab/actions/workflows/ci.yml)
 
-Synthetic public showcase for enterprise workflow design, role-based approvals, auditability, and delivery governance.
+Portfolio-safe enterprise delivery showcase: a synthetic workflow request moves through conditional approvals, change handling, SLA visibility, implementation readiness and handover closure.
 
-This repository demonstrates how a business workflow can be translated into a small, testable software model: clear states, named roles, approval gates, audit events, and implementation handover. It is intentionally employer-neutral and uses demo data only.
+This repository is intentionally small, but it is no longer just a linear state-machine sample. It demonstrates how delivery governance can become executable: request class determines route, each gate requires the right role, decisions carry rationale and conditions, overdue stages can escalate, and implementation cannot be marked complete until readiness evidence exists.
 
-## What This Proves
+![Generated workflow preview](docs/workflow-preview.svg)
 
-| Capability | Evidence in this repo |
-| --- | --- |
-| Digital transformation | Converts a manual business request into a controlled workflow model. |
-| Enterprise systems delivery | Models cross-functional approvals around systems, finance, risk, and implementation. |
-| Technical programme delivery | Uses states, decision logs, release gates, and closure discipline. |
-| Governance and auditability | Records every submission, approval, rejection, implementation, and closure event. |
-| Software engineering foundations | Provides a small Python package, CLI demo, tests, CI, and documented architecture. |
+## 60-Second Review Path
 
-## Demo Scenario
+1. Open [`artifacts/workflow-walkthrough.html`](artifacts/workflow-walkthrough.html) for the visual walkthrough.
+2. Scan [`artifacts/request-brief.md`](artifacts/request-brief.md), [`artifacts/decision-log.md`](artifacts/decision-log.md) and [`artifacts/readiness-checklist.md`](artifacts/readiness-checklist.md).
+3. Inspect [`enterprise_workflow_lab/engine.py`](enterprise_workflow_lab/engine.py) and [`enterprise_workflow_lab/policies.py`](enterprise_workflow_lab/policies.py) for the rules.
+4. Run `python -m unittest discover -s tests` to verify conditional paths and safeguards.
 
-The sample workflow is a synthetic operational request:
+## Business Problem
 
-> A business team requests a procurement-to-payment reporting improvement that touches workflow configuration, finance review, IT assessment, and transformation approval before implementation.
+Enterprise workflow requests often get approved in email, chat or meetings without a clear answer to:
 
-No employer data, client data, credentials, salary/legal information, recruiter material, or private planning records are included.
+- who is allowed to approve this stage;
+- whether the request needs finance, IT or transformation review;
+- what changed after review feedback;
+- whether a stage is aging past SLA;
+- whether implementation is actually ready;
+- what evidence exists for closure.
 
-## Workflow At A Glance
+This lab turns that governance problem into a small, testable model.
+
+## Showcase Scenario
+
+`EWF-2026-001` is a synthetic procurement-to-payment reporting improvement touching workflow, reporting and finance. Because it is high value, moderate risk and system-impacting, it routes through:
 
 ```mermaid
 flowchart LR
-    Draft[Draft] --> Submitted[Submitted]
+    Draft --> Submitted
     Submitted --> Department[Department review]
+    Department --> Changes[Changes requested]
+    Changes --> Submitted
     Department --> Finance[Finance review]
     Finance --> IT[IT review]
     IT --> Transformation[Transformation review]
-    Transformation --> Approved[Approved]
-    Approved --> Implemented[Implemented]
-    Implemented --> Closed[Closed]
-
-    Submitted --> Rejected[Rejected]
+    Transformation --> Approved
+    Approved --> Ready[Implementation ready]
+    Ready --> Implemented
+    Implemented --> Closed
     Department --> Rejected
     Finance --> Rejected
     IT --> Rejected
     Transformation --> Rejected
 ```
 
-## Role Model
+The generated scenario closes on **business day 19**, after **12 audit events**, **5 approval decisions**, **1 resubmission** and **4 readiness checks**.
 
-| Stage | Required role | Decision focus |
-| --- | --- | --- |
-| Department review | `department_owner` | Business need, ownership, readiness, adoption impact. |
-| Finance review | `finance_controller` | Budget, value, risk exposure, commercial implications. |
-| IT review | `it_reviewer` | Systems impact, security, data, integration, supportability. |
-| Transformation review | `transformation_lead` | Delivery fit, governance, prioritisation, implementation plan. |
+## Delivery Artifacts
 
-## Repository Map
-
-| Path | Purpose |
+| Artifact | Purpose |
 | --- | --- |
-| `enterprise_workflow_lab/` | Workflow models, policy rules, state engine, and CLI entry point. |
-| `examples/` | Synthetic request data and a runnable demo script. |
-| `tests/` | Unit tests covering happy path, role enforcement, rejection, and audit events. |
-| `docs/architecture.md` | Architecture and domain model notes. |
-| `docs/portfolio-context.md` | How the project maps to the public portfolio story. |
-| `.github/workflows/ci.yml` | GitHub Actions workflow for test automation. |
+| [`artifacts/workflow-walkthrough.html`](artifacts/workflow-walkthrough.html) | Screenshot-worthy visual timeline with route, SLA status, decisions and readiness gates. |
+| [`artifacts/request-brief.md`](artifacts/request-brief.md) | Requirements-style summary for the same synthetic request. |
+| [`artifacts/raid-log.md`](artifacts/raid-log.md) | Risk, assumption, issue and dependency view tied to the scenario. |
+| [`artifacts/decision-log.md`](artifacts/decision-log.md) | Approval rationale, outcomes and conditions. |
+| [`artifacts/readiness-checklist.md`](artifacts/readiness-checklist.md) | UAT, rollback, handover and support readiness evidence. |
+| [`artifacts/handover-record.md`](artifacts/handover-record.md) | Closure record after implementation. |
+
+## What This Proves
+
+| Capability | Evidence |
+| --- | --- |
+| Enterprise workflow design | Conditional route policies based on request class, value, risk and impacted systems. |
+| Technical programme delivery | Request brief, RAID view, decision log, readiness checklist and handover record. |
+| Governance and auditability | Every transition records actor, role, action, rationale and business day. |
+| Exception handling | Change request and resubmission path, plus terminal rejection safeguards. |
+| SLA and escalation thinking | Stage age, SLA days, overdue/watch/escalate status and negative tests. |
+| Engineering hygiene | Python package, CLI, generated artifacts, tests, CI, `.gitignore` and MIT license. |
 
 ## Quick Start
 
 ```bash
-python -m unittest discover -s tests
 python -m enterprise_workflow_lab demo
+python -m enterprise_workflow_lab build
 python -m enterprise_workflow_lab validate examples/workflow_request.json
+python -m unittest discover -s tests
 ```
 
 Expected demo result:
 
 ```text
-Request EWF-2026-001 closed after 8 audit events.
+Request EWF-2026-001 closed after 12 audit events.
 ```
 
-## Design Principles
+## Repository Map
 
-- Make workflow status visible instead of buried in email or chat.
-- Separate role permission from personal identity so the model remains portable.
-- Keep every state transition auditable.
-- Treat approval as a decision with rationale, not just a checkbox.
-- Keep implementation and closure separate so delivery does not end at approval.
+| Path | Purpose |
+| --- | --- |
+| `enterprise_workflow_lab/` | Models, policy rules, workflow engine, scenario and artifact builder. |
+| `artifacts/` | Generated visual walkthrough and delivery/governance artifacts. |
+| `examples/` | Synthetic request payload and runnable scenario script. |
+| `tests/` | Unit tests for routes, roles, change handling, readiness, SLA and terminal states. |
+| `docs/` | Architecture, preview image, backlog and portfolio context. |
+
+## Privacy Boundary
+
+This repository contains no employer data, client records, personal contact data, credentials, private planning records or production workflow exports. The scenario is synthetic and employer-neutral.
 
 ## Intentional Limits
 
-This is a portfolio-safe demonstration, not a production workflow platform. It does not include authentication, persistence, API endpoints, background jobs, notifications, or UI screens. Those would be natural next steps, but adding them here would distract from the core proof: business workflow modelling, governance, and testable delivery logic.
+This is a portfolio proof, not a production workflow platform. It does not include authentication, persistence, API endpoints, background jobs or notifications. Those would be natural production extensions, but they are intentionally excluded so the governance model remains easy to review.
 
 ## License
 
-MIT. The sample data is synthetic and may be reused as a reference pattern.
+MIT. The sample data and generated artifacts are synthetic and may be reused as reference patterns.

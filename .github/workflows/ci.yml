@@ -22,3 +22,5 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Run unit tests
         run: python -m unittest discover -s tests
+      - name: Build generated showcase artifacts
+        run: python -m enterprise_workflow_lab build

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Enterprise Workflow Delivery Walkthrough</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1d2528;
+      --muted: #59666b;
+      --paper: #f5f6f2;
+      --panel: #ffffff;
+      --line: #d8e0df;
+      --navy: #21394d;
+      --teal: #2e766f;
+      --gold: #b6822e;
+      --rose: #b8564c;
+      --green: #3f7d52;
+      --shadow: 0 18px 44px rgba(33, 57, 77, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+    main { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 34px 0 48px; }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+      gap: 22px;
+      align-items: stretch;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+    h1 { margin: 0 0 10px; color: var(--navy); font-size: clamp(32px, 4vw, 52px); line-height: 1; letter-spacing: 0; }
+    h2 { margin: 0 0 12px; color: var(--navy); font-size: 18px; letter-spacing: 0; }
+    p { margin: 0; color: var(--muted); }
+    .kicker { display: block; margin-bottom: 9px; color: var(--teal); font-size: 12px; font-weight: 850; letter-spacing: .04em; text-transform: uppercase; }
+    .status-card, .panel, .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .status-card { padding: 18px; background: var(--navy); color: #eff5f2; }
+    .status-card p { color: #cbd9d7; }
+    .status-card strong { display: block; margin: 9px 0 8px; color: #fff; font-size: 28px; line-height: 1; }
+    .metrics { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+    .metric { padding: 14px; min-height: 104px; }
+    .metric span { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .metric strong { display: block; margin-top: 9px; color: var(--navy); font-size: 26px; line-height: 1; }
+    .grid { display: grid; gap: 16px; }
+    .two { grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr); }
+    .panel { padding: 18px; overflow: hidden; }
+    .timeline { display: grid; gap: 10px; }
+    .event {
+      display: grid;
+      grid-template-columns: 70px 1fr 104px;
+      gap: 12px;
+      align-items: start;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfb;
+    }
+    .day { color: var(--navy); font-weight: 850; }
+    .event strong { display: block; color: var(--navy); }
+    .event small { display: block; margin-top: 3px; color: var(--muted); }
+    .chip { display: inline-flex; align-items: center; min-height: 26px; padding: 0 9px; border-radius: 999px; font-size: 11px; font-weight: 850; }
+    .chip.on_track, .chip.closed { background: #e2eee5; color: #285a37; }
+    .chip.watch { background: #f8ecd4; color: #815c1d; }
+    .chip.overdue, .chip.escalate { background: #f8dfdc; color: #8f332b; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 10px 9px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--navy); font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
+    .route { display: flex; flex-wrap: wrap; gap: 8px; }
+    .route .chip { background: #e7ece9; color: var(--navy); }
+    @media (max-width: 980px) {
+      header, .two { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .event { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      main { width: min(100% - 22px, 1180px); padding-top: 24px; }
+      .metrics { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <span class="kicker">Enterprise delivery workflow</span>
+        <h1>Controlled Workflow Delivery Walkthrough</h1>
+        <p>Reduce manual follow-up and improve management visibility over approval aging.</p>
+      </div>
+      <aside class="status-card">
+        <span class="kicker">Current state</span>
+        <strong>Closed</strong>
+        <p>EWF-2026-001 closed after 12 auditable events, 5 approval decisions and 1 resubmission.</p>
+      </aside>
+    </header>
+
+    <section class="metrics" aria-label="Workflow metrics">
+      <article class="metric"><span>Request class</span><strong>Controlled Change</strong></article>
+      <article class="metric"><span>Route gates</span><strong>4</strong></article>
+      <article class="metric"><span>Target release</span><strong>Day 20</strong></article>
+      <article class="metric"><span>Actual closure</span><strong>Day 19</strong></article>
+      <article class="metric"><span>Readiness checks</span><strong>4/4</strong></article>
+    </section>
+
+    <section class="grid two">
+      <article class="panel">
+        <h2>Workflow Timeline And SLA Status</h2>
+        <div class="timeline">
+          <div class="event"><div class="day">Day 0</div><div><strong>Submit: Draft → Submitted</strong><small>Demo Requester as requester</small><small>Business owner has prepared the request.</small></div><div><span class="chip watch">1d / SLA 2d</span></div></div><div class="event"><div class="day">Day 1</div><div><strong>Begin Department Review: Submitted → Department Review</strong><small>Department Owner as department owner</small><small>Request is ready for structured review.</small></div><div><span class="chip on_track">1d / SLA 3d</span></div></div><div class="event"><div class="day">Day 2</div><div><strong>Request Changes: Department Review → Changes Requested</strong><small>Department Owner as department owner</small><small>Benefits are clear, but reporting ownership and UAT scope need clarification.</small></div><div><span class="chip on_track">2d / SLA 4d</span></div></div><div class="event"><div class="day">Day 4</div><div><strong>Resubmit Changes: Changes Requested → Submitted</strong><small>Demo Requester as requester</small><small>Added reporting owner, UAT participants and adoption note.</small></div><div><span class="chip watch">1d / SLA 2d</span></div></div><div class="event"><div class="day">Day 5</div><div><strong>Begin Department Review: Submitted → Department Review</strong><small>Department Owner as department owner</small><small>Revised request is ready for approval.</small></div><div><span class="chip on_track">1d / SLA 3d</span></div></div><div class="event"><div class="day">Day 6</div><div><strong>Approve: Department Review → Finance Review</strong><small>Department Owner as department owner</small><small>Ownership, adoption path and operating value confirmed.</small></div><div><span class="chip watch">2d / SLA 2d</span></div></div><div class="event"><div class="day">Day 8</div><div><strong>Approve: Finance Review → It Review</strong><small>Finance Controller as finance controller</small><small>Value proxy and control impact accepted for planned release.</small></div><div><span class="chip watch">2d / SLA 3d</span></div></div><div class="event"><div class="day">Day 10</div><div><strong>Approve: It Review → Transformation Review</strong><small>IT Reviewer as it reviewer</small><small>Systems impact is supportable with reporting access controlled by role.</small></div><div><span class="chip watch">2d / SLA 2d</span></div></div><div class="event"><div class="day">Day 12</div><div><strong>Approve: Transformation Review → Approved</strong><small>Transformation Lead as transformation lead</small><small>Roadmap fit confirmed and implementation can proceed under release governance.</small></div><div><span class="chip watch">2d / SLA 3d</span></div></div><div class="event"><div class="day">Day 14</div><div><strong>Confirm Readiness: Approved → Implementation Ready</strong><small>Implementation Owner as implementation owner</small><small>Readiness gates passed for UAT, rollback, handover and support.</small></div><div><span class="chip on_track">3d / SLA 5d</span></div></div><div class="event"><div class="day">Day 17</div><div><strong>Mark Implemented: Implementation Ready → Implemented</strong><small>Implementation Owner as implementation owner</small><small>Workflow and reporting changes released to the synthetic operations group.</small></div><div><span class="chip watch">2d / SLA 2d</span></div></div><div class="event"><div class="day">Day 19</div><div><strong>Close: Implemented → Closed</strong><small>Transformation Lead as transformation lead</small><small>Adoption confirmed, evidence captured and handover complete.</small></div><div><span class="chip closed">Closed</span></div></div>
+        </div>
+      </article>
+      <article class="panel">
+        <h2>Conditional Route</h2>
+        <p style="margin-bottom: 12px;">Route is determined by request class, value band, risk level and impacted systems.</p>
+        <div class="route">
+          <span class="chip">Department Review</span><span class="chip">Finance Review</span><span class="chip">It Review</span><span class="chip">Transformation Review</span>
+        </div>
+        <h2 style="margin-top: 24px;">Readiness Gates</h2>
+        <table>
+          <tbody>
+            <tr><td>Uat Signed Off</td><td><span class="chip on_track">Passed</span></td></tr><tr><td>Rollback Plan</td><td><span class="chip on_track">Passed</span></td></tr><tr><td>Owner Handover</td><td><span class="chip on_track">Passed</span></td></tr><tr><td>Support Model</td><td><span class="chip on_track">Passed</span></td></tr>
+          </tbody>
+        </table>
+      </article>
+    </section>
+
+    <section class="panel" style="margin-top: 16px;">
+      <h2>Decision Log</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Role</th><th>Decision</th><th>Rationale</th><th>Conditions</th></tr></thead>
+        <tbody>
+          <tr><td>DEC-001</td><td>department_owner</td><td>Changes requested</td><td>Benefits are clear, but reporting ownership and UAT scope need clarification.</td><td>Add named reporting owner, Confirm UAT participants</td></tr><tr><td>DEC-002</td><td>department_owner</td><td>Approved</td><td>Ownership, adoption path and operating value confirmed.</td><td>Operations owner assigned, UAT participants confirmed</td></tr><tr><td>DEC-003</td><td>finance_controller</td><td>Approved</td><td>Value proxy and control impact accepted for planned release.</td><td>No new vendor spend, Finance report owner named</td></tr><tr><td>DEC-004</td><td>it_reviewer</td><td>Approved</td><td>Systems impact is supportable with reporting access controlled by role.</td><td>Access group reviewed, Rollback plan documented</td></tr><tr><td>DEC-005</td><td>transformation_lead</td><td>Approved</td><td>Roadmap fit confirmed and implementation can proceed under release governance.</td><td>Release window agreed, Handover owner confirmed</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

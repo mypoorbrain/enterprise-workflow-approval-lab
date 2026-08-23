@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "enterprise-workflow-approval-lab"
 version = "0.1.0"
-description = "Synthetic enterprise workflow approval engine for portfolio-safe digital transformation demonstration."
+description = "Synthetic enterprise workflow delivery showcase with conditional approvals, SLA visibility, readiness gates, audit trail, and generated artifacts."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }

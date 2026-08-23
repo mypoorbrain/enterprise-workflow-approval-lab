@@ -3,8 +3,10 @@
   "title": "Procurement-to-payment reporting improvement",
   "business_unit": "Operations",
   "requester": "Demo Requester",
-  "value_band": "medium",
+  "value_band": "high",
   "risk_level": "moderate",
+  "request_class": "controlled_change",
+  "target_release_day": 20,
   "systems_impacted": ["workflow", "reporting", "finance"],
-  "business_reason": "Reduce manual follow-up and improve management visibility over approval ageing."
+  "business_reason": "Reduce manual follow-up and improve management visibility over approval aging."
 }

@@ -1,6 +1,6 @@
 # Architecture Notes
 
-The lab is intentionally small. It focuses on the part of transformation work that often becomes unclear in real delivery: who can approve what, what state the request is in, what evidence was captured, and when implementation is genuinely complete.
+The lab focuses on the part of transformation work that often becomes unclear in real delivery: who can approve what, which route applies, what changed after review, whether a stage is aging, and when implementation is genuinely ready.
 
 ## Domain Model
 
@@ -8,14 +8,14 @@ The lab is intentionally small. It focuses on the part of transformation work th
 classDiagram
     class WorkflowRequest {
         request_id
-        title
-        business_unit
-        requester
+        request_class
         value_band
         risk_level
         systems_impacted
-        business_reason
         status
+        current_day
+        resubmission_count
+        readiness_checks
         decisions
         audit_log
     }
@@ -25,6 +25,9 @@ classDiagram
         approver
         rationale
         approved
+        requires_changes
+        decision_id
+        conditions
     }
 
     class AuditEvent {
@@ -34,7 +37,7 @@ classDiagram
         from_status
         to_status
         rationale
-        timestamp
+        business_day
     }
 
     WorkflowRequest "1" --> "*" ApprovalDecision
@@ -45,20 +48,33 @@ classDiagram
 
 | Component | Responsibility |
 | --- | --- |
-| `models.py` | Defines request, decision, audit, role, and status objects. |
-| `policies.py` | Defines the approval gates and required roles. |
-| `engine.py` | Applies workflow transitions and records audit events. |
-| `cli.py` | Provides a small runnable demo and JSON validation command. |
+| `models.py` | Request, role, status, decision and audit-event objects. |
+| `policies.py` | Conditional approval routes, required roles, readiness checks and SLA thresholds. |
+| `engine.py` | Transition rules, role enforcement, change handling, readiness gate, closure and SLA snapshots. |
+| `scenarios.py` | Single synthetic portfolio scenario used by CLI, tests and artifacts. |
+| `artifacts.py` | Generates the HTML walkthrough, markdown delivery artifacts, JSON summary and SVG preview. |
+| `cli.py` | Runs the scenario, builds artifacts and validates request JSON. |
 
-## State Transition Rules
+## Conditional Route Logic
 
-- A requester submits a draft.
-- A department owner starts review.
-- Each approval gate requires a specific role.
-- A rejection moves the request to a terminal rejected state.
-- Approval and implementation are separate states.
+The approval route is determined from request class, value band, risk level and impacted systems:
+
+- department review is always required;
+- finance review is required for medium/high value or controlled/procurement changes;
+- IT review is required when systems are impacted;
+- transformation review is required for moderate/high risk, high value, cross-functional or controlled changes.
+
+## Safeguards
+
+- Rejection is terminal.
+- Change requests are not terminal; they require requester resubmission.
+- Role mismatches raise workflow errors.
+- Business day cannot move backwards.
+- Implementation requires all readiness checks to pass first.
 - Closure requires transformation lead confirmation after implementation.
 
-## Why This Shape
+## Artifact Lineage
 
-The architecture keeps policy separate from execution. That makes it easier to explain the workflow to business stakeholders, test the control points, and extend the model later with persistence, notifications, APIs, or a user interface.
+`scenarios.py` -> `WorkflowEngine` -> `artifacts/workflow-summary.json` -> generated markdown/HTML/SVG artifacts.
+
+All generated artifacts use the same synthetic request, so the visual walkthrough, decision log, RAID view, readiness checklist and handover record tell one coherent delivery story.

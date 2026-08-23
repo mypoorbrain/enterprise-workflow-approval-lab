@@ -1,0 +1,20 @@
+{
+  "request_id": "EWF-2026-001",
+  "title": "Procurement-to-payment reporting improvement",
+  "status": "closed",
+  "route": [
+    "department_review",
+    "finance_review",
+    "it_review",
+    "transformation_review"
+  ],
+  "audit_events": 12,
+  "decisions": 5,
+  "resubmissions": 1,
+  "readiness_checks": {
+    "uat_signed_off": true,
+    "rollback_plan": true,
+    "owner_handover": true,
+    "support_model": true
+  }
+}
