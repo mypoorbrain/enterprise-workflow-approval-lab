@@ -1,0 +1,10 @@
+{
+  "request_id": "EWF-2026-001",
+  "title": "Procurement-to-payment reporting improvement",
+  "business_unit": "Operations",
+  "requester": "Demo Requester",
+  "value_band": "medium",
+  "risk_level": "moderate",
+  "systems_impacted": ["workflow", "reporting", "finance"],
+  "business_reason": "Reduce manual follow-up and improve management visibility over approval ageing."
+}
