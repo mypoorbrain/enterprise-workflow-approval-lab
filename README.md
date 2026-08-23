@@ -1,5 +1,7 @@
 # Enterprise Workflow Approval Lab
 
+[![CI](https://github.com/mypoorbrain/enterprise-workflow-approval-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/mypoorbrain/enterprise-workflow-approval-lab/actions/workflows/ci.yml)
+
 Synthetic public showcase for enterprise workflow design, role-based approvals, auditability, and delivery governance.
 
 This repository demonstrates how a business workflow can be translated into a small, testable software model: clear states, named roles, approval gates, audit events, and implementation handover. It is intentionally employer-neutral and uses demo data only.
