@@ -16,19 +16,15 @@ Candidate artifact:
 - evaluation rubric
 - synthetic examples only
 
-## 2. Operations Intelligence / BI Demo
+## Completed Public Lane
 
-Purpose: show reporting, BI, SQL/data thinking, operational KPIs, and management decision support.
+### Operations Intelligence / BI Demo
 
-Candidate artifact:
+Status: published as [operations-intelligence-bi-demo](https://github.com/mypoorbrain/operations-intelligence-bi-demo).
 
-- synthetic operational dataset
-- SQL transformation queries
-- KPI dictionary
-- lightweight dashboard or static report
-- data-quality notes
+Portfolio signal: reporting, BI, SQL/data thinking, operational KPIs, management decision support, data-quality validation and dashboard presentation.
 
-## 3. Technical Programme Delivery Toolkit
+## 2. Technical Programme Delivery Toolkit
 
 Purpose: show programme delivery discipline and governance.
 
@@ -41,7 +37,7 @@ Candidate artifact:
 - stakeholder communication template
 - sample delivery pack using synthetic data
 
-## 4. Modern Full-Stack Proof
+## 3. Modern Full-Stack Proof
 
 Purpose: show current application delivery ability without duplicating Sabiso prematurely.
 
