@@ -10,10 +10,14 @@ This repository is intentionally small, but it is no longer just a linear state-
 
 ## 60-Second Review Path
 
-1. Open [`artifacts/workflow-walkthrough.html`](artifacts/workflow-walkthrough.html) for the visual walkthrough.
-2. Scan [`artifacts/request-brief.md`](artifacts/request-brief.md), [`artifacts/decision-log.md`](artifacts/decision-log.md) and [`artifacts/readiness-checklist.md`](artifacts/readiness-checklist.md).
-3. Inspect [`enterprise_workflow_lab/engine.py`](enterprise_workflow_lab/engine.py) and [`enterprise_workflow_lab/policies.py`](enterprise_workflow_lab/policies.py) for the rules.
+1. Open [`artifacts/workflow-walkthrough.html`](artifacts/workflow-walkthrough.html) for the screenshot-ready walkthrough with visible status transitions, approval conditions, SLA escalation state, readiness gates and handover evidence.
+2. Use the drill-down links into [`artifacts/request-brief.md`](artifacts/request-brief.md), [`artifacts/decision-log.md`](artifacts/decision-log.md), [`artifacts/readiness-checklist.md`](artifacts/readiness-checklist.md) and [`artifacts/handover-record.md`](artifacts/handover-record.md).
+3. Inspect [`enterprise_workflow_lab/engine.py`](enterprise_workflow_lab/engine.py) and [`enterprise_workflow_lab/policies.py`](enterprise_workflow_lab/policies.py) for the executable rules.
 4. Run `python -m unittest discover -s tests` to verify conditional paths and safeguards.
+
+## Live Demo Readiness
+
+The repository now includes a root [`index.html`](index.html) that redirects to the generated walkthrough, so GitHub Pages can serve the portfolio artifact without a build step. Pages is not enabled from this local pass. The minimal one-time repository action is: **Settings → Pages → Deploy from branch → `main` / root**. Expected URL after enabling: `https://mypoorbrain.github.io/enterprise-workflow-approval-lab/`.
 
 ## Business Problem
 
@@ -57,7 +61,7 @@ The generated scenario closes on **business day 19**, after **12 audit events**,
 
 | Artifact | Purpose |
 | --- | --- |
-| [`artifacts/workflow-walkthrough.html`](artifacts/workflow-walkthrough.html) | Screenshot-worthy visual timeline with route, SLA status, decisions and readiness gates. |
+| [`artifacts/workflow-walkthrough.html`](artifacts/workflow-walkthrough.html) | Screenshot-worthy visual timeline with route, state transitions, SLA status, decisions, readiness gates and handover evidence. |
 | [`artifacts/request-brief.md`](artifacts/request-brief.md) | Requirements-style summary for the same synthetic request. |
 | [`artifacts/raid-log.md`](artifacts/raid-log.md) | Risk, assumption, issue and dependency view tied to the scenario. |
 | [`artifacts/decision-log.md`](artifacts/decision-log.md) | Approval rationale, outcomes and conditions. |

@@ -1,5 +1,6 @@
 import unittest
 
+from enterprise_workflow_lab.artifacts import render_walkthrough_html
 from enterprise_workflow_lab.engine import WorkflowEngine, WorkflowError
 from enterprise_workflow_lab.models import ApprovalDecision, Role, Status, WorkflowRequest
 from enterprise_workflow_lab.policies import approval_route_for
@@ -121,6 +122,21 @@ class WorkflowEngineTest(unittest.TestCase):
         snapshot = self.engine.sla_snapshot(request)
         self.assertTrue(snapshot["is_overdue"])
         self.assertEqual("escalate", snapshot["escalation_level"])
+
+    def test_walkthrough_surface_shows_state_readiness_handover_and_artifact_drilldowns(self) -> None:
+        html = render_walkthrough_html(run_demo())
+        for marker in [
+            "Visible workflow state transitions",
+            "Change / resubmission",
+            "SLA / escalation",
+            "Readiness",
+            "Handover",
+            "Artifact drill-down links",
+            "readiness-checklist.md",
+            "handover-record.md",
+            "@media (max-width: 980px)",
+        ]:
+            self.assertIn(marker, html)
 
 
 def run_to_approved(engine: WorkflowEngine, request: WorkflowRequest) -> WorkflowRequest:

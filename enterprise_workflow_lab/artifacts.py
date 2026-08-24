@@ -51,6 +51,8 @@ def summary_payload(request: WorkflowRequest) -> dict[str, Any]:
 def render_walkthrough_html(request: WorkflowRequest) -> str:
     route = approval_route_for(request)
     timeline = stage_timeline(request)
+    escalation_count = sum(1 for item in timeline if item["sla_level"] in {"overdue", "escalate"})
+    readiness_passed = sum(1 for passed in request.readiness_checks.values() if passed)
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -102,13 +104,59 @@ def render_walkthrough_html(request: WorkflowRequest) -> str:
     .status-card {{ padding: 18px; background: var(--navy); color: #eff5f2; }}
     .status-card p {{ color: #cbd9d7; }}
     .status-card strong {{ display: block; margin: 9px 0 8px; color: #fff; font-size: 28px; line-height: 1; }}
-    .metrics {{ display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }}
+    .metrics {{ display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }}
     .metric {{ padding: 14px; min-height: 104px; }}
     .metric span {{ color: var(--muted); font-size: 12px; font-weight: 800; }}
     .metric strong {{ display: block; margin-top: 9px; color: var(--navy); font-size: 26px; line-height: 1; }}
     .grid {{ display: grid; gap: 16px; }}
     .two {{ grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr); }}
     .panel {{ padding: 18px; overflow: hidden; }}
+    .state-strip {{
+      display: grid;
+      grid-template-columns: repeat(8, minmax(110px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      padding-bottom: 3px;
+    }}
+    .state-node {{
+      min-height: 86px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfb;
+    }}
+    .state-node span {{ display: block; color: var(--muted); font-size: 11px; font-weight: 850; text-transform: uppercase; }}
+    .state-node strong {{ display: block; margin-top: 7px; color: var(--navy); font-size: 13px; line-height: 1.2; }}
+    .state-node.done {{ border-color: rgba(46, 118, 111, .35); box-shadow: inset 0 4px 0 var(--teal); }}
+    .state-node.loop {{ border-color: rgba(182, 130, 46, .48); box-shadow: inset 0 4px 0 var(--gold); }}
+    .state-node.current {{ border-color: rgba(63, 125, 82, .45); box-shadow: inset 0 4px 0 var(--green); }}
+    .evidence-grid {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }}
+    .evidence-card {{
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfb;
+      padding: 12px;
+      min-height: 100px;
+    }}
+    .evidence-card span {{ color: var(--muted); font-size: 11px; font-weight: 850; text-transform: uppercase; }}
+    .evidence-card strong {{ display: block; margin-top: 7px; color: var(--navy); font-size: 13px; line-height: 1.25; }}
+    .evidence-card p {{ margin-top: 7px; font-size: 12px; }}
+    .artifact-links {{ display: grid; gap: 8px; margin-top: 14px; }}
+    .artifact-links a {{
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--navy);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 800;
+      background: #fbfcfb;
+    }}
+    .artifact-links a span {{ color: var(--muted); font-weight: 700; }}
     .timeline {{ display: grid; gap: 10px; }}
     .event {{
       display: grid;
@@ -135,6 +183,7 @@ def render_walkthrough_html(request: WorkflowRequest) -> str:
     @media (max-width: 980px) {{
       header, .two {{ grid-template-columns: 1fr; }}
       .metrics {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+      .evidence-grid {{ grid-template-columns: 1fr; }}
       .event {{ grid-template-columns: 1fr; }}
     }}
     @media (max-width: 620px) {{
@@ -163,7 +212,12 @@ def render_walkthrough_html(request: WorkflowRequest) -> str:
       <article class="metric"><span>Route gates</span><strong>{len(route)}</strong></article>
       <article class="metric"><span>Target release</span><strong>Day {request.target_release_day}</strong></article>
       <article class="metric"><span>Actual closure</span><strong>Day {request.current_day}</strong></article>
-      <article class="metric"><span>Readiness checks</span><strong>{sum(1 for passed in request.readiness_checks.values() if passed)}/{len(request.readiness_checks)}</strong></article>
+      <article class="metric"><span>Readiness checks</span><strong>{readiness_passed}/{len(request.readiness_checks)}</strong></article>
+      <article class="metric"><span>SLA escalations</span><strong>{escalation_count}</strong></article>
+    </section>
+
+    <section class="state-strip" aria-label="Visible workflow state transitions">
+      {render_state_strip(request)}
     </section>
 
     <section class="grid two">
@@ -185,6 +239,34 @@ def render_walkthrough_html(request: WorkflowRequest) -> str:
             {''.join(f'<tr><td>{escape(name.replace("_", " ").title())}</td><td><span class="chip on_track">Passed</span></td></tr>' for name, passed in request.readiness_checks.items() if passed)}
           </tbody>
         </table>
+        <div class="evidence-grid">
+          <article class="evidence-card">
+            <span>Change / resubmission</span>
+            <strong>{request.resubmission_count} loop completed</strong>
+            <p>Department review requested clarification; requester resubmitted ownership, UAT and adoption evidence before approval continued.</p>
+          </article>
+          <article class="evidence-card">
+            <span>SLA / escalation</span>
+            <strong>{escalation_count} escalations</strong>
+            <p>Every timeline event carries an SLA chip; overdue stages would move from watch to overdue or escalate.</p>
+          </article>
+          <article class="evidence-card">
+            <span>Readiness</span>
+            <strong>{readiness_passed}/{len(request.readiness_checks)} gates passed</strong>
+            <p>Implementation cannot be marked complete until UAT, rollback, owner handover and support model evidence pass.</p>
+          </article>
+          <article class="evidence-card">
+            <span>Handover</span>
+            <strong>Closed on day {request.current_day}</strong>
+            <p>Closure records adoption confirmation, evidence capture and transformation-lead handover.</p>
+          </article>
+        </div>
+        <div class="artifact-links" aria-label="Artifact drill-down links">
+          <a href="request-brief.md">Request brief <span>requirements</span></a>
+          <a href="decision-log.md">Decision log <span>approvals</span></a>
+          <a href="readiness-checklist.md">Readiness checklist <span>evidence</span></a>
+          <a href="handover-record.md">Handover record <span>closure</span></a>
+        </div>
       </article>
     </section>
 
@@ -201,6 +283,19 @@ def render_walkthrough_html(request: WorkflowRequest) -> str:
 </body>
 </html>
 """
+
+
+def render_state_strip(request: WorkflowRequest) -> str:
+    nodes = []
+    for index, event in enumerate(request.audit_log):
+        css = "loop" if event.to_status == Status.CHANGES_REQUESTED else "current" if index == len(request.audit_log) - 1 else "done"
+        nodes.append(
+            f"""<article class="state-node {css}">
+              <span>Day {event.business_day}</span>
+              <strong>{escape(event.to_status.value.replace("_", " ").title())}</strong>
+            </article>"""
+        )
+    return "".join(nodes)
 
 
 def render_event(item: dict[str, Any]) -> str:
